@@ -8,6 +8,7 @@ const bot = require('./bot/index')
 
 // Import API routes untuk dashboard
 const apiRoutes = require('./api/routes')
+const { startScheduler } = require('./services/scheduler')
 
 // Middleware untuk membaca JSON request body
 app.use(express.json())
@@ -46,3 +47,6 @@ app.listen(PORT, () => {
 // Start Bot Telegram
 bot.start()
 console.log('🤖 Bot Telegram aktif')
+
+// Start Scheduler
+startScheduler(bot)

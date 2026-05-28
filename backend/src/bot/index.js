@@ -6,6 +6,7 @@ const photoHandler = require('./handlers/photo')
 
 const bot = new Bot(process.env.BOT_TOKEN)
 
+
 // Middleware whitelist
 bot.use(whitelist)
 

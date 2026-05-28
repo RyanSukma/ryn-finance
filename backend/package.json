@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "start": "node src/index.js",
-  "dev": "node --watch src/index.js"
-},
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "node-cron": "^4.2.1",
+    "puppeteer": "^25.1.0"
+  }
 }

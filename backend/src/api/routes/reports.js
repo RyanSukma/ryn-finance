@@ -2,13 +2,28 @@ const express = require('express')
 const supabase = require('../../db/supabase')
 
 const router = express.Router()
+const bot = require('../../bot')
+const { runMonthlyRecap } = require('../../services/scheduler')
 
 // GET /api/v1/reports
 router.get('/', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('monthly_reports')
-      .select('id, period, total_amount, pdf_url, generated_at, sent_at')
+      .select(`
+  id,
+  user_id,
+  period,
+  total_amount,
+  pdf_url,
+  generated_at,
+  sent_at,
+  users:user_id (
+    id,
+    name,
+    telegram_id
+  )
+`)
       .order('generated_at', { ascending: false })
 
     if (error) {
@@ -31,7 +46,32 @@ router.get('/', async (req, res) => {
     })
   }
 })
+// POST /api/v1/reports/generate
+// Untuk testing manual generate PDF
+router.post('/generate', async (req, res) => {
+  try {
+    const { mode, send_to_telegram } = req.body
 
+    const result = await runMonthlyRecap(bot, {
+      mode: mode || 'current-month',
+      sendToTelegram: send_to_telegram ?? false
+    })
+
+    return res.status(201).json({
+      success: true,
+      message: 'Laporan berhasil dibuat.',
+      data: result
+    })
+  } catch (error) {
+    console.error('POST /reports/generate error:', error)
+
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal membuat laporan.',
+      error: error.message
+    })
+  }
+})
 // GET /api/v1/reports/:period
 // Contoh period: 2026-05
 router.get('/:period', async (req, res) => {
@@ -40,7 +80,20 @@ router.get('/:period', async (req, res) => {
 
     const { data, error } = await supabase
       .from('monthly_reports')
-      .select('id, period, total_amount, pdf_url, generated_at, sent_at')
+      .select(`
+  id,
+  user_id,
+  period,
+  total_amount,
+  pdf_url,
+  generated_at,
+  sent_at,
+  users:user_id (
+    id,
+    name,
+    telegram_id
+  )
+`)
       .eq('period', period)
       .maybeSingle()
 
