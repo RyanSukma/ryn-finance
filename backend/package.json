@@ -1,16 +1,29 @@
 {
-  "name": "backend",
+  "name": "ryn-finance-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend API and Telegram bot for RynFinance",
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js"
   },
-  "keywords": [],
+  "keywords": [
+    "finance",
+    "telegram-bot",
+    "express",
+    "supabase"
+  ],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
+    "@supabase/supabase-js": "^2.87.1",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "grammy": "^1.38.5",
     "node-cron": "^4.2.1",
     "puppeteer": "^25.1.0"
   }
