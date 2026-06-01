@@ -198,4 +198,55 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// POST /api/v1/transactions
+router.post('/', async (req, res) => {
+  try {
+    const { user_id, amount, description, source = 'manual', created_at } = req.body
+
+    if (!user_id || !amount || !description) {
+      return res.status(400).json({
+        success: false,
+        message: 'user_id, amount, dan description wajib diisi.'
+      })
+    }
+
+    const payload = {
+      user_id,
+      amount: parseInt(amount),
+      description,
+      source
+    }
+    
+    if (created_at) {
+      payload.created_at = created_at
+    }
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert(payload)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('POST /transactions error:', error)
+      return res.status(500).json({
+        success: false,
+        message: 'Gagal menambahkan transaksi.'
+      })
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: 'Transaksi berhasil ditambahkan.',
+      data
+    })
+  } catch (error) {
+    console.error('POST /transactions exception:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan server.'
+    })
+  }
+})
+
 module.exports = router
