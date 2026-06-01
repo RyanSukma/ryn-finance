@@ -2,7 +2,9 @@ export const dynamic = 'force-dynamic'
 
 import SummaryCard from '@/components/SummaryCard'
 import StatusBadge from '@/components/StatusBadge'
-import { getReports, getTransactions, getTransactionsSummary } from '@/lib/api'
+import MonthPicker from '@/components/MonthPicker'
+import { Suspense } from 'react'
+import { getReports, getTransactionsFiltered, getTransactionsSummary } from '@/lib/api'
 import {
   formatRupiah,
   formatTanggalSingkat,
@@ -56,7 +58,25 @@ type Report = {
   } | null
 }
 
-export default async function OverviewPage() {
+export default async function OverviewPage(props: any) {
+  const searchParams = (await props.searchParams) || {};
+  const monthParam = searchParams.month as string;
+  
+  let dateFrom, dateTo;
+  if (monthParam) {
+    const [year, month] = monthParam.split('-');
+    const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+    dateFrom = `${year}-${month}-01`;
+    dateTo = `${year}-${month}-${lastDay}`;
+  } else {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
+    dateFrom = `${year}-${month}-01`;
+    dateTo = `${year}-${month}-${lastDay}`;
+  }
+
   let summary: SummaryData = {
     total_family: 0,
     transaction_count: 0,
@@ -69,8 +89,8 @@ export default async function OverviewPage() {
 
   try {
     const [summaryResult, transactionsResult, reportsResult] = await Promise.all([
-      getTransactionsSummary(),
-      getTransactions(),
+      getTransactionsSummary({ date_from: dateFrom, date_to: dateTo }),
+      getTransactionsFiltered({ date_from: dateFrom, date_to: dateTo }),
       getReports()
     ])
 
@@ -110,10 +130,15 @@ export default async function OverviewPage() {
         </div>
       ) : null}
 
-      <div className="mb-8">
-        <p className="text-slate-500 mb-1">
-          Berikut adalah ringkasan keuangan Anda bulan ini.
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <p className="text-slate-500 mb-1">
+            Berikut adalah ringkasan keuangan Anda.
+          </p>
+        </div>
+        <Suspense fallback={<div className="h-10 w-40 bg-slate-100 rounded-lg animate-pulse" />}>
+          <MonthPicker />
+        </Suspense>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -134,7 +159,7 @@ export default async function OverviewPage() {
                 key={user.user_id}
                 title={`Pengeluaran ${user.name}`}
                 value={`Rp ${formatRupiah(user.total)}`}
-                description={`${user.transaction_count} transaksi bulan ini`}
+                description={`${user.transaction_count} transaksi periode ini`}
                 icon={
                   <div className={`${color.bg} ${color.text} rounded-xl p-2.5`}>
                     <svg
@@ -222,7 +247,7 @@ export default async function OverviewPage() {
                         colSpan={6}
                         className="px-6 py-12 text-center text-slate-500"
                       >
-                        Belum ada transaksi bulan ini.
+                        Belum ada transaksi pada periode ini.
                       </td>
                     </tr>
                   ) : (
