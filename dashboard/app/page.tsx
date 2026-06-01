@@ -66,15 +66,15 @@ export default async function OverviewPage(props: any) {
   if (monthParam) {
     const [year, month] = monthParam.split('-');
     const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
-    dateFrom = `${year}-${month}-01`;
-    dateTo = `${year}-${month}-${lastDay}`;
+    dateFrom = `${year}-${month}-01T00:00:00.000Z`;
+    dateTo = `${year}-${month}-${lastDay}T23:59:59.999Z`;
   } else {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
-    dateFrom = `${year}-${month}-01`;
-    dateTo = `${year}-${month}-${lastDay}`;
+    dateFrom = `${year}-${month}-01T00:00:00.000Z`;
+    dateTo = `${year}-${month}-${lastDay}T23:59:59.999Z`;
   }
 
   let summary: SummaryData = {
