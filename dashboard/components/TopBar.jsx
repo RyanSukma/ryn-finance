@@ -1,9 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import AddTransactionModal from './AddTransactionModal'
 
 export default function TopBar() {
   const router = useRouter()
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -33,6 +36,17 @@ export default function TopBar() {
       </div>
 
       <div className="flex items-center ml-6 space-x-3">
+        {/* Add Transaction Button */}
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="hidden sm:flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm mr-2"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Tambah Manual
+        </button>
+
         {/* Notifications */}
         <button className="p-2 rounded-full text-slate-500 hover:bg-slate-100 transition-colors relative badge-pulse">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,6 +89,15 @@ export default function TopBar() {
           </div>
         </div>
       </div>
+      
+      <AddTransactionModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onSuccess={() => {
+          // You could trigger a global refresh or state update here if needed
+          // router.refresh() is already called in the modal
+        }}
+      />
     </header>
   )
 }

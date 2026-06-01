@@ -35,6 +35,13 @@ export async function deleteTransaction(id) {
   return proxyFetch(`/transactions/${id}`, { method: 'DELETE' })
 }
 
+export async function createTransaction(data) {
+  return proxyFetch('/transactions', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+}
+
 export async function fetchUsers() {
   return proxyFetch('/users')
 }
